@@ -11,6 +11,7 @@ import { CommentModule } from './comment/comment.module';
 import { ChecklistItemModule } from './checklist-item/checklist-item.module';
 import { SupabaseService } from './supabase/supabase.service';
 import { SupabaseModule } from './supabase/supabase.module';
+import { AuthModule } from './auth/auth.module';
 
 import * as process from 'node:process';
 import * as dotenv from 'dotenv';
@@ -39,6 +40,7 @@ dotenv.config();
     CommentModule,
     ChecklistItemModule,
     SupabaseModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService, GatewayGateway, SupabaseService],
