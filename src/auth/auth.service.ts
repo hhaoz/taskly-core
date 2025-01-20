@@ -1,13 +1,16 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import * as admin from 'firebase-admin';
+import * as process from 'node:process';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
+const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
 
 @Injectable()
 export class AuthService {
   constructor() {
     admin.initializeApp({
-      credential: admin.credential.cert(
-        './todolist-246-25a-firebase-adminsdk-zwkfa-13218b0caa.json',
-      ),
+      credential: admin.credential.cert(serviceAccount),
     });
   }
 
