@@ -25,4 +25,8 @@ export class CardService {
       relations: ['comments', 'checklistItems'],
     });
   }
+
+  removeAll() {
+    return this.cardRepository.delete({});
+  }
 }

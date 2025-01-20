@@ -1,10 +1,20 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  ManyToMany,
+  PrimaryGeneratedColumn,
+  OneToMany,
+} from 'typeorm';
 import { timestamp } from 'rxjs';
+import { User } from '../../user/entities/user.entity';
+import { Task } from '../../task/entities/task.entity';
+import { PrimaryColumn } from 'typeorm';
 
 @Entity()
 export class Board {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryColumn('uuid')
+  id: string;
 
   @Column()
   name: string;
@@ -12,6 +22,15 @@ export class Board {
   @Column('timestamptz')
   createdAt: Date;
 
-  @Column('boolean')
-  is_public: boolean;
+  @OneToMany(() => Task, (task) => task.board)
+  tasks: Task[];
+
+  @ManyToOne(() => User, (user) => user.ownedBoards, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  owner: User;
+
+  @ManyToMany(() => User, (user) => user.joinedBoards)
+  members: User[];
 }

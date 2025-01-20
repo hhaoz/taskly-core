@@ -1,11 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { CreateBoardDto } from './dto/create-board.dto';
 import { UpdateBoardDto } from './dto/update-board.dto';
+import { SupabaseService } from '../supabase/supabase.service';
 
 @Injectable()
 export class BoardService {
-  create(createBoardDto: CreateBoardDto) {
-    return 'This action adds a new board';
+  constructor(private supabase: SupabaseService) {}
+
+  create(createBoardDto: CreateBoardDto, userId: string) {
+    const newBoard = {
+      name: createBoardDto.name,
+      createdAt: new Date(),
+      ownerId: userId,
+    };
+    return this.supabase.supabase.from('board').upsert(newBoard);
   }
 
   findAll() {

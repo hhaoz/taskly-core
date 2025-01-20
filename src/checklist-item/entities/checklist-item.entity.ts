@@ -9,7 +9,7 @@ export class ChecklistItem {
   @Column('text')
   name: string;
 
-  @ManyToOne(() => Card, (card) => card.checklistItems)
+  @ManyToOne(() => Card, (card) => card.checklistItems, { onDelete: 'CASCADE' })
   card: Card;
 
   @Column('int4')

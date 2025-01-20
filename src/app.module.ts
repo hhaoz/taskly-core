@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
@@ -12,9 +12,11 @@ import { ChecklistItemModule } from './checklist-item/checklist-item.module';
 import { SupabaseService } from './supabase/supabase.service';
 import { SupabaseModule } from './supabase/supabase.module';
 import { AuthModule } from './auth/auth.module';
+import { UserModule } from './user/user.module';
 
 import * as process from 'node:process';
 import * as dotenv from 'dotenv';
+import { AuthMiddleware } from './auth/auth.middleware';
 
 dotenv.config();
 
@@ -41,11 +43,16 @@ dotenv.config();
     ChecklistItemModule,
     SupabaseModule,
     AuthModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService, GatewayGateway, SupabaseService],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(AuthMiddleware).forRoutes('*');
+  }
+}
 
 console.log(
   process.env.DB_HOST,
