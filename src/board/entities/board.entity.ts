@@ -13,7 +13,7 @@ import { PrimaryColumn } from 'typeorm';
 
 @Entity()
 export class Board {
-  @PrimaryColumn('uuid')
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column()
