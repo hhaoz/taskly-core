@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   Req,
+  Put,
 } from '@nestjs/common';
 import { BoardService } from './board.service';
 import { CreateBoardDto } from './dto/create-board.dto';
@@ -22,19 +23,20 @@ export class BoardController {
     return this.boardService.create(createBoardDto, req.user.uid);
   }
 
-  @Get()
-  findAll() {
-    return this.boardService.findAll();
+  @Get('get-all-by-uid')
+  findAll(@Req() req: any) {
+    return this.boardService.findAll(req.user.uid);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.boardService.findOne(+id);
-  }
+  // @Get(':id')
+  // findOne(@Param('id') id: string) {
+  //   return this.boardService.findOne(+id);
+  // }
 
-  @Patch(':id')
+  //update name
+  @Put(':id')
   update(@Param('id') id: string, @Body() updateBoardDto: UpdateBoardDto) {
-    return this.boardService.update(+id, updateBoardDto);
+    return this.boardService.update(id, updateBoardDto);
   }
 
   @Delete(':id')

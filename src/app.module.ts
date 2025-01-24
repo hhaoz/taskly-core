@@ -17,6 +17,7 @@ import { UserModule } from './user/user.module';
 import * as process from 'node:process';
 import * as dotenv from 'dotenv';
 import { AuthMiddleware } from './auth/auth.middleware';
+import { BoardLabelModule } from './board_label/board_label.module';
 
 dotenv.config();
 
@@ -44,6 +45,7 @@ dotenv.config();
     SupabaseModule,
     AuthModule,
     UserModule,
+    BoardLabelModule,
   ],
   controllers: [AppController],
   providers: [AppService, GatewayGateway, SupabaseService],

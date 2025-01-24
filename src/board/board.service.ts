@@ -16,19 +16,34 @@ export class BoardService {
     return this.supabase.supabase.from('board').upsert(newBoard);
   }
 
-  findAll() {
-    return `This action returns all board`;
-  }
+  async findAll(uid: string) {
+    const { data, error } = await this.supabase.supabase
+      .from('board')
+      .select()
+      .eq('ownerId', uid);
+    if (error) {
+      return error.message;
+    }
 
-  findOne(id: number) {
-    return `This action returns a #${id} board`;
-  }
-
-  update(id: number, updateBoardDto: UpdateBoardDto) {
-    return `This action updates a #${id} board`;
+    return data;
   }
 
   remove(id: number) {
     return `This action removes a #${id} board`;
+  }
+
+  async update(id: string, updateBoardDto: UpdateBoardDto) {
+    const { data, error } = await this.supabase.supabase
+      .from('board')
+      .update({
+        name: updateBoardDto.name,
+      })
+      .eq('id', id)
+      .single();
+    if (error) {
+      return error.message;
+    }
+
+    return data;
   }
 }

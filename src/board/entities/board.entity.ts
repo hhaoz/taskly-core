@@ -10,6 +10,7 @@ import { timestamp } from 'rxjs';
 import { User } from '../../user/entities/user.entity';
 import { Task } from '../../task/entities/task.entity';
 import { PrimaryColumn } from 'typeorm';
+import { BoardLabel } from '../../board_label/entities/board_label.entity';
 
 @Entity()
 export class Board {
@@ -30,6 +31,9 @@ export class Board {
     onDelete: 'CASCADE',
   })
   owner: User;
+
+  @OneToMany(() => BoardLabel, (boardLabel) => boardLabel.board)
+  labels: BoardLabel[];
 
   @ManyToMany(() => User, (user) => user.joinedBoards)
   members: User[];

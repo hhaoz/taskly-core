@@ -16,8 +16,8 @@ export class TaskController {
   constructor(private readonly taskService: TaskService) {}
 
   @Post()
-  create(@Body() createTaskDto: CreateTaskDto[]) {
-    return this.taskService.create(createTaskDto);
+  create(@Body() req: { boardId: string; tasks: CreateTaskDto[] }) {
+    return this.taskService.create(req.tasks, req.boardId);
   }
 
   @Get('cards')
