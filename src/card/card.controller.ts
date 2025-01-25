@@ -24,4 +24,9 @@ export class CardController {
   findAll() {
     return this.cardService.findAll();
   }
+
+  @Delete()
+  removeAll() {
+    return this.cardService.removeAll();
+  }
 }

@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { initSupabase } from './initSupabase';
+import * as process from 'node:process';
 
 @Injectable()
 export class SupabaseService {
   public supabase: SupabaseClient = createClient(
-    initSupabase.supabaseUrl,
-    initSupabase.supabaseKey,
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_KEY,
   );
 
   constructor() {

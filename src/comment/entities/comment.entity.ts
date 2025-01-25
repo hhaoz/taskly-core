@@ -6,13 +6,17 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Card } from '../../card/entities/card.entity';
+import { User } from '../../user/entities/user.entity';
 
 @Entity()
 export class Comment {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Card, (card) => card.comments)
+  @ManyToOne(() => User, (user) => user.comments)
+  user: User;
+
+  @ManyToOne(() => Card, (card) => card.comments, { onDelete: 'CASCADE' })
   card: Card;
 
   @Column('text')
