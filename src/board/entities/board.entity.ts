@@ -23,7 +23,10 @@ export class Board {
   @Column('timestamptz')
   createdAt: Date;
 
-  @OneToMany(() => Task, (task) => task.board)
+  @OneToMany(() => Task, (task) => task.board, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   tasks: Task[];
 
   @ManyToOne(() => User, (user) => user.ownedBoards, {

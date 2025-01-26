@@ -28,8 +28,8 @@ export class BoardService {
     return data;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} board`;
+  async remove(id: string) {
+    return this.supabase.supabase.from('board').delete().eq('id', id);
   }
 
   async update(id: string, updateBoardDto: UpdateBoardDto) {

@@ -14,8 +14,8 @@ import { BoardLabel } from '../../board_label/entities/board_label.entity';
 
 @Entity()
 export class Card {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column()
   title: string;

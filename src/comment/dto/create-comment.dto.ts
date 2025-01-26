@@ -1,4 +1,4 @@
 export class CreateCommentDto {
   text: string;
-  cardId: number;
+  cardId: string;
 }

@@ -20,9 +20,9 @@ export class TaskController {
     return this.taskService.create(req.tasks, req.boardId);
   }
 
-  @Get('cards')
-  findAllCards() {
-    return this.taskService.findAllCards();
+  @Get('cards/:boardId')
+  findAllCards(@Param('boardId') boardId: string) {
+    return this.taskService.findAllCardsInTasks(boardId);
   }
 
   @Get()
