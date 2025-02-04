@@ -39,6 +39,7 @@ export class BoardController {
     return this.boardService.update(id, updateBoardDto);
   }
 
+  //delete board
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.boardService.remove(id);

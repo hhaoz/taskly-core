@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Body,
+  Put,
   Patch,
   Param,
   Delete,
@@ -16,8 +17,23 @@ export class CardController {
   constructor(private readonly cardService: CardService) {}
 
   @Post()
-  create(@Body() createCardDto: CreateCardDto) {
-    return this.cardService.create(createCardDto);
+  create(@Body() req: { card: CreateCardDto; listId: string }) {
+    return this.cardService.create(req.card, req.listId);
+  }
+
+  @Put('/:id')
+  updateCard(@Param('id') id: string, @Body() req: UpdateCardDto) {
+    return this.cardService.updateCard(id, req);
+  }
+
+  @Post('/add-new-member')
+  addNewMember(@Body() req: { cardId: string; userId: string }) {
+    return this.cardService.addNewMember(req.cardId, req.userId);
+  }
+
+  @Put('/position')
+  updatePosition(@Body() cards: UpdateCardDto[]) {
+    return this.cardService.updatePosition(cards);
   }
 
   @Get()
@@ -25,8 +41,13 @@ export class CardController {
     return this.cardService.findAll();
   }
 
-  @Delete()
-  removeAll() {
-    return this.cardService.removeAll();
+  @Delete('/:id')
+  remove(@Param('id') id: string) {
+    return this.cardService.remove(id);
+  }
+
+  @Delete('/remove-member')
+  removeMember(@Body() req: { cardId: string; userId: string }) {
+    return this.cardService.removeMember(req.cardId, req.userId);
   }
 }

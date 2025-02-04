@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Comment } from './entities/comment.entity';
 import { Card } from '../card/entities/card.entity';
+import { SupabaseService } from '../supabase/supabase.service';
 
 @Injectable()
 export class CommentService {
@@ -13,38 +14,52 @@ export class CommentService {
     private commentRepository: Repository<Comment>,
     @InjectRepository(Card)
     private cardRepository: Repository<Card>,
+    private supabase: SupabaseService,
   ) {}
 
-  async create(createCommentDto: CreateCommentDto) {
-    return await this.cardRepository
-      .findOne({ where: { id: createCommentDto.cardId } })
-      .then((card) => {
-        if (!card) {
-          throw new Error('Card not found');
-        }
-
-        const comment = this.commentRepository.create({
-          text: createCommentDto.text,
-          card: card,
-        });
-
-        return this.commentRepository.save(comment);
-      });
+  async create(createCommentDto: CreateCommentDto, uid: string) {
+    const { data, error } = await this.supabase.supabase
+      .from('comment')
+      .insert({ ...createCommentDto, userId: uid })
+      .select();
+    if (error) {
+      throw new BadRequestException(error.message);
+    }
+    return data;
   }
 
-  findAll() {
-    return `This action returns all comment`;
+  async findAll(id: string) {
+    const { data, error } = await this.supabase.supabase
+      .from('comment')
+      .select()
+      .eq('cardId', id);
+    if (error) {
+      throw new BadRequestException(error.message);
+    }
+    return data;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} comment`;
+  async update(id: number, updateCommentDto: UpdateCommentDto) {
+    const { data, error } = await this.supabase.supabase
+      .from('comment')
+      .update(updateCommentDto)
+      .eq('id', id)
+      .select();
+    if (error) {
+      throw new BadRequestException(error.message);
+    }
+    return data;
   }
 
-  update(id: number, updateCommentDto: UpdateCommentDto) {
-    return `This action updates a #${id} comment`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} comment`;
+  async remove(id: string) {
+    const { data, error } = await this.supabase.supabase
+      .from('comment')
+      .delete()
+      .eq('id', id)
+      .select();
+    if (error) {
+      throw new BadRequestException(error.message);
+    }
+    return data;
   }
 }

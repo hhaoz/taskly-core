@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 import { timestamp } from 'rxjs';
 import { User } from '../../user/entities/user.entity';
-import { Task } from '../../task/entities/task.entity';
+import { List } from '../../list/entities/list.entity';
 import { PrimaryColumn } from 'typeorm';
 import { BoardLabel } from '../../board_label/entities/board_label.entity';
 
@@ -23,11 +23,11 @@ export class Board {
   @Column('timestamptz')
   createdAt: Date;
 
-  @OneToMany(() => Task, (task) => task.board, {
+  @OneToMany(() => List, (task) => task.board, {
     cascade: true,
     onDelete: 'CASCADE',
   })
-  tasks: Task[];
+  tasks: List[];
 
   @ManyToOne(() => User, (user) => user.ownedBoards, {
     cascade: true,

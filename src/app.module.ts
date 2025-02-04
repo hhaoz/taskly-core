@@ -3,7 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { TaskModule } from './task/task.module';
+import { ListModule } from './list/listModule';
 import { CardModule } from './card/card.module';
 import { GatewayGateway } from './gateway/gateway.gateway';
 import { BoardModule } from './board/board.module';
@@ -18,6 +18,7 @@ import * as process from 'node:process';
 import * as dotenv from 'dotenv';
 import { AuthMiddleware } from './auth/auth.middleware';
 import { BoardLabelModule } from './board_label/board_label.module';
+import { CardAttachmentModule } from './card_attachment/card_attachment.module';
 
 dotenv.config();
 
@@ -37,7 +38,7 @@ dotenv.config();
       synchronize: true,
       ssl: { rejectUnauthorized: false },
     }),
-    TaskModule,
+    ListModule,
     CardModule,
     BoardModule,
     CommentModule,
@@ -46,6 +47,7 @@ dotenv.config();
     AuthModule,
     UserModule,
     BoardLabelModule,
+    CardAttachmentModule,
   ],
   controllers: [AppController],
   providers: [AppService, GatewayGateway, SupabaseService],

@@ -9,7 +9,7 @@ import { Card } from '../../card/entities/card.entity';
 import { Board } from '../../board/entities/board.entity';
 
 @Entity()
-export class Task {
+export class List {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -22,7 +22,7 @@ export class Task {
   @Column('int4')
   position: number;
 
-  @OneToMany(() => Card, (card) => card.task)
+  @OneToMany(() => Card, (card) => card.list)
   cards: Card[];
 
   @ManyToOne(() => Board, (board) => board.tasks, {

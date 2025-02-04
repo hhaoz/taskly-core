@@ -1,6 +1,6 @@
 import { CreateCardDto } from '../../card/dto/create-card.dto';
 
-export class CreateTaskDto {
+export class CreateListDto {
   title: string;
   cards: CreateCardDto[];
 }

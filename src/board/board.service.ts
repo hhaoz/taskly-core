@@ -13,7 +13,7 @@ export class BoardService {
       createdAt: new Date(),
       ownerId: userId,
     };
-    return this.supabase.supabase.from('board').upsert(newBoard);
+    return this.supabase.supabase.from('board').upsert(newBoard).select();
   }
 
   async findAll(uid: string) {
