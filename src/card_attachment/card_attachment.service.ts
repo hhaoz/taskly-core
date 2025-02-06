@@ -7,33 +7,35 @@ import { SupabaseService } from '../supabase/supabase.service';
 export class CardAttachmentService {
   constructor(private supabase: SupabaseService) {}
 
-  async create(createCardAttachmentDto: CreateCardAttachmentDto) {
-    console.log(createCardAttachmentDto);
-
-    const { error } = await this.supabase.supabase.storage
+  async create(createCardAttachmentDto: {
+    file: Express.Multer.File;
+    cardId: string;
+  }) {
+    const { data: uploadedFile, error } = await this.supabase.supabase.storage
       .from('card_attachment')
       .upload(
-        `${createCardAttachmentDto.cardId}/${createCardAttachmentDto.file.name}`,
-        createCardAttachmentDto.file,
+        `${createCardAttachmentDto.cardId}/${createCardAttachmentDto.file.originalname}`,
+        createCardAttachmentDto.file.buffer,
         {
           upsert: true,
-          contentType: createCardAttachmentDto.file.type,
+          contentType: createCardAttachmentDto.file.mimetype,
         },
       );
     if (error) {
       return new BadRequestException(error.message);
     }
+    console.log(uploadedFile);
 
     const { data } = this.supabase.supabase.storage
       .from('card_attachment')
       .getPublicUrl(
-        `${createCardAttachmentDto.cardId}/${createCardAttachmentDto.file.name}`,
+        `${createCardAttachmentDto.cardId}/${createCardAttachmentDto.file.originalname}`,
       );
 
     const newCardAttachment = {
       cardId: createCardAttachmentDto.cardId,
       fileUrl: data,
-      fileName: createCardAttachmentDto.file.name,
+      fileName: createCardAttachmentDto.file.originalname,
     };
 
     return this.supabase.supabase
@@ -43,7 +45,7 @@ export class CardAttachmentService {
   }
 
   findAll() {
-    return `This action returns all cardAttachment`;
+    return this.supabase.supabase.from('card_attachment').select();
   }
 
   findOne(id: number) {
@@ -54,7 +56,33 @@ export class CardAttachmentService {
     return `This action updates a #${id} cardAttachment`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} cardAttachment`;
+  async remove(id: string) {
+    const { data, error } = await this.supabase.supabase
+      .from('card_attachment')
+      .select('id')
+      .eq('id', id);
+    if (error) {
+      throw new BadRequestException(error.message);
+    }
+    if (data.length === 0) {
+      throw new BadRequestException('Attachment not found');
+    }
+
+    //delelte from storage
+    const { data: deletedFile, error: deleteFileError } =
+      await this.supabase.supabase.storage
+        .from('card_attachment')
+        .remove([`${id}`]);
+
+    const { data: deletedAttachment, error: deleteError } =
+      await this.supabase.supabase
+        .from('card_attachment')
+        .delete()
+        .eq('id', id)
+        .select();
+    if (deleteError) {
+      throw new BadRequestException(deleteError.message);
+    }
+    return deletedAttachment;
   }
 }
