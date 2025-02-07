@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Put,
+} from '@nestjs/common';
 import { BoardLabelService } from './board_label.service';
 import { CreateBoardLabelDto } from './dto/create-board_label.dto';
 import { UpdateBoardLabelDto } from './dto/update-board_label.dto';
@@ -7,28 +16,28 @@ import { UpdateBoardLabelDto } from './dto/update-board_label.dto';
 export class BoardLabelController {
   constructor(private readonly boardLabelService: BoardLabelService) {}
 
-  @Post()
+  @Post('new-label')
   create(@Body() createBoardLabelDto: CreateBoardLabelDto) {
     return this.boardLabelService.create(createBoardLabelDto);
   }
 
-  @Get()
-  findAll() {
-    return this.boardLabelService.findAll();
+  @Post('add-label-to-card')
+  addLabelToCard(@Body() req: { cardId: string; labelId: string }) {
+    return this.boardLabelService.addLabelToCard(req.cardId, req.labelId);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.boardLabelService.findOne(+id);
+  findAll(@Param('id') id: string) {
+    return this.boardLabelService.findAll(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateBoardLabelDto: UpdateBoardLabelDto) {
-    return this.boardLabelService.update(+id, updateBoardLabelDto);
+  @Put()
+  update(@Body() updateBoardLabelDto: UpdateBoardLabelDto) {
+    return this.boardLabelService.update(updateBoardLabelDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.boardLabelService.remove(+id);
+    return this.boardLabelService.remove(id);
   }
 }

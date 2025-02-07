@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ListController } from './listController';
+import { ListController } from './list.controller';
 import { ListService } from './list.service';
 
 describe('ListController', () => {

@@ -3,7 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ListModule } from './list/listModule';
+import { ListModule } from './list/list.module';
 import { CardModule } from './card/card.module';
 import { GatewayGateway } from './gateway/gateway.gateway';
 import { BoardModule } from './board/board.module';

@@ -32,9 +32,9 @@ export class CardAttachmentController {
     });
   }
 
-  @Get()
-  findAll() {
-    return this.cardAttachmentService.findAll();
+  @Get('/:id')
+  findAll(@Param('id') cardId: string) {
+    return this.cardAttachmentService.findAll(cardId);
   }
 
   @Delete(':id')

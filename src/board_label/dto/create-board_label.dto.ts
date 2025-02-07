@@ -1,1 +1,5 @@
-export class CreateBoardLabelDto {}
+export class CreateBoardLabelDto {
+  name: string;
+  color: string;
+  boardId: string;
+}

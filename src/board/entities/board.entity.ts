@@ -35,7 +35,10 @@ export class Board {
   })
   owner: User;
 
-  @OneToMany(() => BoardLabel, (boardLabel) => boardLabel.board)
+  @OneToMany(() => BoardLabel, (boardLabel) => boardLabel.board, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   labels: BoardLabel[];
 
   @ManyToMany(() => User, (user) => user.joinedBoards)

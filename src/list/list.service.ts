@@ -100,7 +100,20 @@ export class ListService {
       }
       list.cards = data;
       for (let card of list.cards) {
-        delete card.position;
+        //select assigned users and board labels
+        Promise.all([
+          this.supbaseService.supabase
+            .from('user_card')
+            .select('userId')
+            .eq('cardId', card.id),
+          this.supbaseService.supabase
+            .from('labels_cards')
+            .select('boardLabelId')
+            .eq('cardId', card.id),
+        ]).then((results) => {
+          card.assignedUsers = results[0].data;
+          card.labels = results[1].data;
+        });
       }
     }
     return lists;

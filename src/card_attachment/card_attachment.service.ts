@@ -44,8 +44,11 @@ export class CardAttachmentService {
       .select();
   }
 
-  findAll() {
-    return this.supabase.supabase.from('card_attachment').select();
+  findAll(cardId: string) {
+    return this.supabase.supabase
+      .from('card_attachment')
+      .select()
+      .eq('cardId', cardId);
   }
 
   findOne(id: number) {

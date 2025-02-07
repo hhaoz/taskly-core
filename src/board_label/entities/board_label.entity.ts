@@ -14,7 +14,9 @@ export class BoardLabel {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => Board, (board) => board.labels)
+  @ManyToOne(() => Board, (board) => board.labels, {
+    onDelete: 'CASCADE',
+  })
   board: Board;
 
   @Column('text')
