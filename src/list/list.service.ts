@@ -103,9 +103,9 @@ export class ListService {
         //select assigned users and board labels
         Promise.all([
           this.supbaseService.supabase
-            .from('user_card')
-            .select('userId')
-            .eq('cardId', card.id),
+            .from('user_cards')
+            .select('user_id')
+            .eq('card_id', card.id),
           this.supbaseService.supabase
             .from('labels_cards')
             .select('boardLabelId')
@@ -144,7 +144,8 @@ export class ListService {
         .from('list')
         .select()
         .eq('boardId', boardId)
-        .order('position', { ascending: false });
+        .order('position', { ascending: false })
+        .limit(1);
     if (listsError) {
       throw new BadRequestException(listsError.message);
     }
