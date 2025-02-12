@@ -6,10 +6,12 @@ import {
   OneToMany,
   ManyToMany,
   PrimaryColumn,
+  ManyToOne,
 } from 'typeorm';
 import { Board } from '../../board/entities/board.entity';
 import { Comment } from '../../comment/entities/comment.entity';
 import { Card } from '../../card/entities/card.entity';
+import { Notification } from '../../notifications/entities/notification.entity';
 
 @Entity()
 export class User {
@@ -49,4 +51,16 @@ export class User {
     inverseJoinColumn: { name: 'card_id', referencedColumnName: 'id' },
   })
   cards: Card[];
+
+  @OneToMany(() => Notification, (notification) => notification.user, {
+    onDelete: 'CASCADE',
+    cascade: true,
+  })
+  notifications: Notification[];
+
+  @OneToMany(() => Notification, (notification) => notification.sender, {
+    onDelete: 'CASCADE',
+    cascade: true,
+  })
+  sentNotifications: Notification[];
 }

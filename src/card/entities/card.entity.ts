@@ -12,6 +12,7 @@ import { Comment } from '../../comment/entities/comment.entity';
 import { User } from '../../user/entities/user.entity';
 import { BoardLabel } from '../../board_label/entities/board_label.entity';
 import { CardAttachment } from '../../card_attachment/entities/card_attachment.entity';
+import { Notification } from '../../notifications/entities/notification.entity';
 
 @Entity()
 export class Card {
@@ -54,4 +55,10 @@ export class Card {
     onDelete: 'CASCADE',
   })
   cardAttachments: CardAttachment[];
+
+  @ManyToOne(() => Notification, (notification) => notification.card, {
+    onDelete: 'CASCADE',
+    cascade: true,
+  })
+  notifications: Notification[];
 }
