@@ -146,10 +146,10 @@ export class BoardService {
       .eq('boardId', id);
 
     if (memberError) {
-      throw new BadRequestException(memberError.message);
+      data.members = [];
+    } else {
+      data.members = members;
     }
-
-    data.members = members;
 
     //get labels
     const { data: labels, error: labelError } = await this.supabase.supabase
@@ -158,10 +158,10 @@ export class BoardService {
       .eq('boardId', id);
 
     if (labelError) {
-      throw new BadRequestException(labelError.message);
+      data.labels = [];
+    } else {
+      data.labels = labels;
     }
-
-    data.labels = labels;
 
     return data;
   }
