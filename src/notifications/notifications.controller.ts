@@ -39,7 +39,7 @@ export class NotificationsController {
     );
   }
 
-  @Get('/:userId/:limit/:offset')
+  @Get(':userId/:limit/:offset')
   findAll(
     @Param('userId') userId: string,
     @Param('limit') limit: number,
@@ -48,7 +48,7 @@ export class NotificationsController {
     return this.notificationsService.findAll(userId, limit, offset);
   }
 
-  @Get('/isNewNotification/:userId')
+  @Get('isNewNotification/:userId')
   isNewNotification(@Param('userId') userId: string) {
     return this.notificationsService.isNewNotification(userId);
   }
@@ -66,5 +66,10 @@ export class NotificationsController {
       req.notificationId,
       req.isAccepted,
     );
+  }
+
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.notificationsService.remove(id);
   }
 }

@@ -4,6 +4,7 @@ import { UpdateNotificationDto } from './dto/update-notification.dto';
 import { SupabaseService } from '../supabase/supabase.service';
 import * as CardDTO from './dto/create-card-notification.dto';
 import { range } from 'rxjs';
+import { NotificationType } from '../enums/notification-type.enum';
 
 @Injectable()
 export class NotificationsService {
@@ -18,7 +19,7 @@ export class NotificationsService {
       .range(offset, offset + limit);
 
     if (error) {
-      return new BadRequestException(error.message);
+      throw new BadRequestException(error.message);
     }
 
     return this.supabase.supabase
@@ -38,7 +39,7 @@ export class NotificationsService {
       .single();
 
     if (error) {
-      return new BadRequestException(error.message);
+      return false;
     }
     return data.length > 0;
   }
@@ -47,16 +48,17 @@ export class NotificationsService {
     // Lấy dữ liệu của thông báo trước khi xóa
     const { data: noti, error } = await this.supabase.supabase
       .from('notification')
-      .select('boardId, userId')
+      .select('boardId, userId, senderId')
       .eq('id', notificationId)
       .single();
 
     if (error || !noti) {
-      return new BadRequestException('Notification not found');
+      throw new BadRequestException('Notification not found');
     }
 
     const boardId = noti.boardId;
-    const userId = noti.userId;
+    const receiver = noti.userId;
+    const sender = noti.senderId;
 
     const { error: deleteError } = await this.supabase.supabase
       .from('notification')
@@ -64,38 +66,79 @@ export class NotificationsService {
       .eq('id', notificationId);
 
     if (deleteError) {
-      return new BadRequestException(deleteError.message);
+      throw new BadRequestException(deleteError.message);
     }
 
+    // check if user is already a member of this board
     const { data: boardMember, error: boardMemberError } =
       await this.supabase.supabase
         .from('board_members')
         .select()
-        .eq('user_id', userId)
+        .eq('user_id', receiver)
         .eq('board_id', boardId)
         .single();
 
     if (boardMemberError) {
-      return new BadRequestException(boardMemberError.message);
+      throw new BadRequestException(boardMemberError.message);
     }
 
     if (boardMember) {
-      return new BadRequestException('User is already a member of this board');
+      throw new BadRequestException('User is already a member of this board');
     }
 
     if (isAccepted && boardId) {
       const { data, error } = await this.supabase.supabase
         .from('board_members')
         .insert({
-          user_id: userId,
+          user_id: receiver,
           board_id: boardId,
         });
 
       if (error) {
-        return new BadRequestException(error.message);
+        throw new BadRequestException(error.message);
+      }
+
+      // create notification for sender
+      const newNotification = {
+        type: NotificationType.ACCEPT_INVITE,
+        boardId,
+        userId: sender,
+        senderId: receiver,
+        read: false,
+      };
+
+      const { data: senderNoti, error: senderNotiError } =
+        await this.supabase.supabase
+          .from('notification')
+          .insert(newNotification)
+          .select();
+
+      if (senderNotiError) {
+        throw new BadRequestException(senderNotiError.message);
       }
 
       return data;
+    }
+
+    if (!isAccepted && boardId) {
+      const newNotification = {
+        type: NotificationType.DECLINE_INVITE,
+        boardId,
+        userId: sender,
+        senderId: receiver,
+        read: false,
+      };
+
+      const { data: senderNoti, error: senderNotiError } =
+        await this.supabase.supabase
+          .from('notification')
+          .insert(newNotification)
+          .select();
+
+      if (senderNotiError) {
+        throw new BadRequestException(senderNotiError.message);
+      }
+      return senderNoti;
     }
 
     return {
@@ -116,7 +159,7 @@ export class NotificationsService {
       .select();
 
     if (error) {
-      return new BadRequestException(error.message);
+      throw new BadRequestException(error.message);
     }
 
     return data;
@@ -138,7 +181,20 @@ export class NotificationsService {
       .select();
 
     if (error) {
-      return new BadRequestException(error.message);
+      throw new BadRequestException(error.message);
+    }
+
+    return data;
+  }
+
+  async remove(id: string) {
+    const { data, error } = await this.supabase.supabase
+      .from('notification')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      throw new BadRequestException(error.message);
     }
 
     return data;

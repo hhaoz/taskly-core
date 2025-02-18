@@ -22,7 +22,7 @@ interface column {
 }
 
 interface Board {
-  tasks: column[];
+  lists: column[];
   members: {
     id: string;
     mouse: { x: number; y: number };
@@ -47,24 +47,24 @@ export class GatewayGateway
     @ConnectedSocket() client: Socket,
     @MessageBody() payload: any,
   ) {
-    const { boardId, tasks } = payload;
+    const { boardId, lists } = payload;
     if (!this.boards[boardId]) {
-      this.boards[boardId] = { tasks: [], members: [] };
+      this.boards[boardId] = { lists: [], members: [] };
     }
-    this.boards[boardId].tasks = tasks;
+    this.boards[boardId].lists = lists;
     this.boards[boardId].members.push({ id: client.id, mouse: { x: 0, y: 0 } });
     client.join(boardId);
     console.log('Client joined board', client.id, this.boards[boardId]);
   }
 
-  @SubscribeMessage('tasksChange')
-  handleTasksChange(
+  @SubscribeMessage('listsChange')
+  handleListsChange(
     @ConnectedSocket() client: Socket,
     @MessageBody() payload: any,
   ) {
-    const { boardId, tasks } = payload;
-    this.boards[boardId].tasks = tasks;
-    client.to(boardId).emit('tasksChange', tasks);
+    const { boardId, lists } = payload;
+    this.boards[boardId].lists = lists;
+    client.to(boardId).emit('listsChange', lists);
   }
 
   @SubscribeMessage('mouseMove')

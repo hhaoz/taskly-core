@@ -20,6 +20,7 @@ import { AuthMiddleware } from './auth/auth.middleware';
 import { BoardLabelModule } from './board_label/board_label.module';
 import { CardAttachmentModule } from './card_attachment/card_attachment.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { BackgroundModule } from './background/background.module';
 
 dotenv.config();
 
@@ -50,6 +51,7 @@ dotenv.config();
     BoardLabelModule,
     CardAttachmentModule,
     NotificationsModule,
+    BackgroundModule,
   ],
   controllers: [AppController],
   providers: [AppService, GatewayGateway, SupabaseService],

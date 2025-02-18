@@ -5,6 +5,8 @@ import {
   ManyToMany,
   PrimaryGeneratedColumn,
   OneToMany,
+  OneToOne,
+  JoinTable,
 } from 'typeorm';
 import { timestamp } from 'rxjs';
 import { User } from '../../user/entities/user.entity';
@@ -12,6 +14,7 @@ import { List } from '../../list/entities/list.entity';
 import { PrimaryColumn } from 'typeorm';
 import { BoardLabel } from '../../board_label/entities/board_label.entity';
 import { Notification } from '../../notifications/entities/notification.entity';
+import { Background } from '../../background/entities/background.entity';
 
 @Entity()
 export class Board {
@@ -28,7 +31,7 @@ export class Board {
     cascade: true,
     onDelete: 'CASCADE',
   })
-  tasks: List[];
+  lists: List[];
 
   @ManyToOne(() => User, (user) => user.ownedBoards, {
     cascade: true,
@@ -45,9 +48,12 @@ export class Board {
   @ManyToMany(() => User, (user) => user.joinedBoards)
   members: User[];
 
-  @ManyToOne(() => Notification, (notification) => notification.board, {
+  @OneToMany(() => Notification, (notification) => notification.board, {
     onDelete: 'CASCADE',
     cascade: true,
   })
   notifications: Notification[];
+
+  @ManyToOne(() => Background)
+  background: Background;
 }

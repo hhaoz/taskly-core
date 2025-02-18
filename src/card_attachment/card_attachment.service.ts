@@ -22,7 +22,7 @@ export class CardAttachmentService {
         },
       );
     if (error) {
-      return new BadRequestException(error.message);
+      throw new BadRequestException(error.message);
     }
     console.log(uploadedFile);
 

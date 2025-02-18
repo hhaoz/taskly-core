@@ -13,16 +13,16 @@ export class BoardLabelService {
       .select('id')
       .eq('id', createBoardLabelDto.boardId);
     if (error) {
-      return new BadRequestException(error.message);
+      throw new BadRequestException(error.message);
     }
     if (exitingBoard.length === 0) {
-      return new BadRequestException('Board not found');
+      throw new BadRequestException('Board not found');
     }
     const { data, error: insertError } = await this.supabase.supabase
       .from('board_label')
       .insert(createBoardLabelDto);
     if (insertError) {
-      return new BadRequestException(insertError.message);
+      throw new BadRequestException(insertError.message);
     }
     return data;
   }
@@ -33,11 +33,11 @@ export class BoardLabelService {
       .select('id')
       .eq('id', boardId);
     if (boardError) {
-      return new BadRequestException(boardError.message);
+      throw new BadRequestException(boardError.message);
     }
 
     if (board.length === 0) {
-      return new BadRequestException('Board not found');
+      throw new BadRequestException('Board not found');
     }
 
     const { data, error } = await this.supabase.supabase
@@ -45,7 +45,7 @@ export class BoardLabelService {
       .select()
       .eq('boardId', boardId);
     if (error) {
-      return new BadRequestException(error.message);
+      throw new BadRequestException(error.message);
     }
     return data;
   }
@@ -61,7 +61,7 @@ export class BoardLabelService {
       .eq('id', updateBoardLabelDto.id)
       .select();
     if (error) {
-      return new BadRequestException(error.message);
+      throw new BadRequestException(error.message);
     }
     return data;
   }
@@ -72,7 +72,7 @@ export class BoardLabelService {
       .delete()
       .eq('id', id);
     if (error) {
-      return new BadRequestException(error.message);
+      throw new BadRequestException(error.message);
     }
     return data;
   }
@@ -84,10 +84,10 @@ export class BoardLabelService {
       .eq('cardId', cardId)
       .eq('boardLabelId', boardLabelId);
     if (error) {
-      return new BadRequestException(error.message);
+      throw new BadRequestException(error.message);
     }
     if (exitingCardLabel.length > 0) {
-      return new BadRequestException('Label already added to card');
+      throw new BadRequestException('Label already added to card');
     }
 
     return this.supabase.supabase
