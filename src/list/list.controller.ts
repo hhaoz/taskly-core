@@ -29,6 +29,7 @@ export class ListController {
 
   @Get('cards/:boardId')
   findAllCards(@Param('boardId') boardId: string) {
+    console.log(boardId);
     return this.listService.findAllCardsInLists(boardId);
   }
 
