@@ -1,15 +1,7 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-import { CreateListDto } from './dto/create-list.dto';
-import { UpdateListDto } from './dto/update-list.dto';
-import { InjectRepository } from '@nestjs/typeorm';
-import { List } from './entities/list.entity';
-import { Repository } from 'typeorm';
-import { Card } from '../card/entities/card.entity';
-import { SupabaseService } from '../supabase/supabase.service';
+import {BadRequestException, Injectable, NotFoundException,} from '@nestjs/common';
+import {CreateListDto} from './dto/create-list.dto';
+import {UpdateListDto} from './dto/update-list.dto';
+import {SupabaseService} from '../supabase/supabase.service';
 
 @Injectable()
 export class ListService {
@@ -220,5 +212,72 @@ export class ListService {
     }
 
     return data;
+  }
+
+  async updateListCard(previousList: UpdateListDto, list: UpdateListDto, boardId: string) {
+    if (!previousList || !list) {
+      throw new BadRequestException('No lists provided');
+    }
+
+    if (boardId) {
+      const { data, error } = await this.supbaseService.supabase
+        .from('board')
+        .select()
+        .eq('id', boardId);
+      if (error) {
+        throw new BadRequestException(error.message);
+      }
+      if (data.length === 0) {
+        throw new NotFoundException('Board not found');
+      }
+    } else {
+      throw new BadRequestException('No boardId provided');
+    }
+
+    const { data: previousListData, error: previousListError } =
+      await this.supbaseService.supabase
+        .from('list')
+        .select()
+        .eq('id', previousList.id);
+    if (previousListError) {
+      throw new BadRequestException(previousListError.message);
+    }
+
+    const { data: ListData, error: ListError } =
+      await this.supbaseService.supabase
+        .from('list')
+        .select()
+        .eq('id', list.id);
+    if (ListError) {
+      throw new BadRequestException(ListError.message);
+    }
+
+    if (previousListData.length === 0 || ListData.length === 0) {
+      throw new NotFoundException('List not found');
+    }
+
+    console.log(previousList.cards, list.cards);
+
+    let promises = [];
+
+    console.log(list.cards);
+
+    for (let i = 0; i < previousList.cards.length; i++) {
+        promises.push(this.supbaseService.supabase
+            .from('card')
+            .update({ listId: previousList.id , position: i })
+            .eq('id', previousList.cards[i].id)
+            .select());
+    }
+    for (let i = 0; i < list.cards.length; i++) {
+      promises.push(this.supbaseService.supabase
+          .from('card')
+          .update({ listId: list.id, position: i })
+          .eq('id', list.cards[i].id)
+          .select());
+    }
+    let result = await Promise.all(promises);
+    console.log(result);
+    return result;
   }
 }
