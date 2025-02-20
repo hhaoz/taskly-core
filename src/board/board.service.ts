@@ -165,4 +165,11 @@ export class BoardService {
 
     return data;
   }
+
+  search(search: string) {
+    return this.supabase.supabase
+      .from('board')
+      .select()
+      .textSearch('name', search);
+  }
 }

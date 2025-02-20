@@ -9,6 +9,7 @@ import {
   Req,
   Put,
   UploadedFile,
+  Query,
 } from '@nestjs/common';
 import { BoardService } from './board.service';
 import { CreateBoardDto } from './dto/create-board.dto';
@@ -56,6 +57,12 @@ export class BoardController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.boardService.findOne(id);
+  }
+
+  @Get('search')
+  search(@Query('search') search: string) {
+    console.log(search);
+    return this.boardService.search(search);
   }
 
   //update name
