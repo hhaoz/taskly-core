@@ -166,10 +166,16 @@ export class BoardService {
     return data;
   }
 
-  search(search: string) {
-    return this.supabase.supabase
-      .from('board')
-      .select()
-      .textSearch('name', search);
+  async search(search: string) {
+    let { data, error } = await this.supabase.supabase
+        .rpc('search_boards', {
+          search_term: search,
+        })
+
+    if (error) {
+      throw new BadRequestException(error.message);
+    }
+
+    return data;
   }
 }

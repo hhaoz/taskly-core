@@ -59,10 +59,10 @@ export class BoardController {
     return this.boardService.findOne(id);
   }
 
-  @Get('search')
-  search(@Query('search') search: string) {
+  @Post('search')
+  search(@Body() search: { search: string }) {
     console.log(search);
-    return this.boardService.search(search);
+    return this.boardService.search(search.search);
   }
 
   //update name

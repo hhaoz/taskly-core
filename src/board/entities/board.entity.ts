@@ -21,7 +21,7 @@ export class Board {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column('text')
   name: string;
 
   @Column('timestamptz')
