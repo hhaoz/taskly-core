@@ -21,4 +21,9 @@ export class BackgroundController {
   findAllPredefined() {
     return this.backgroundService.findAllPredefined();
   }
+
+  // @Get(':id')
+  // findOne(@Param('id') id: string) {
+  //   return this.backgroundService.findOne(id);
+  // }
 }

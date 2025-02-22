@@ -49,16 +49,18 @@ export class BoardController {
     return this.boardService.findInvitedBoards(req.user.uid);
   }
 
-  @Get('background/:id')
-  findBackground(@Param('id') id: string) {
-    return this.boardService.findBackground(id);
-  }
+  // @Get('background/:id')
+  // findBackground(@Param('id') id: string) {
+  //   return this.boardService.findBackground(id);
+  // }
 
+  //
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.boardService.findOne(id);
   }
 
+  //
   @Post('search')
   search(@Body() search: { search: string }) {
     console.log(search);

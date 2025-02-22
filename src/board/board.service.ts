@@ -151,6 +151,22 @@ export class BoardService {
       data.members = members;
     }
 
+    console.log(data.backgroundId);
+
+    //get Background
+    const { data: background, error: backgroundError } =
+      await this.supabase.supabase
+        .from('background')
+        .select('fileLocation, color')
+        .eq('id', data.backgroundId)
+        .single();
+
+    if (backgroundError) {
+      data.background = {};
+    } else {
+      data.background = background;
+    }
+
     //get labels
     const { data: labels, error: labelError } = await this.supabase.supabase
       .from('board_label')
@@ -167,14 +183,19 @@ export class BoardService {
   }
 
   async search(search: string) {
-    let { data, error } = await this.supabase.supabase
-        .rpc('search_boards', {
-          search_term: search,
-        })
+    // let { data, error } = await this.supabase.supabase
+    //     .rpc('search_boards', {
+    //       search_term: search,
+    //     })
+    //
+    // if (error) {
+    //   throw new BadRequestException(error.message);
+    // }
 
-    if (error) {
-      throw new BadRequestException(error.message);
-    }
+    const { data, error } = await this.supabase.supabase
+      .from('board')
+      .select()
+      .ilike('name', `%${search}%`);
 
     return data;
   }

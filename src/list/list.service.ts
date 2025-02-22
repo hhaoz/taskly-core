@@ -1,7 +1,11 @@
-import {BadRequestException, Injectable, NotFoundException,} from '@nestjs/common';
-import {CreateListDto} from './dto/create-list.dto';
-import {UpdateListDto} from './dto/update-list.dto';
-import {SupabaseService} from '../supabase/supabase.service';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { CreateListDto } from './dto/create-list.dto';
+import { UpdateListDto } from './dto/update-list.dto';
+import { SupabaseService } from '../supabase/supabase.service';
 
 @Injectable()
 export class ListService {
@@ -138,15 +142,18 @@ export class ListService {
         .eq('boardId', boardId)
         .order('position', { ascending: false })
         .limit(1);
+    console.log(listsError);
     if (listsError) {
       throw new BadRequestException(listsError.message);
     }
 
-    if (lists.length === 0) {
+    if (lists.length == 0) {
       lastPosition = 0;
     } else {
       lastPosition = lists[0].position;
     }
+
+    console.log(createListDto);
 
     const list = {
       title: createListDto.title,
@@ -161,7 +168,23 @@ export class ListService {
     if (error) {
       throw new BadRequestException(error.message);
     }
-    return data;
+    //get all lists
+    const { data: allLists, error: allListsError } =
+      await this.supbaseService.supabase
+        .from('list')
+        .select()
+        .eq('boardId', boardId)
+        .order('position');
+    if (allListsError) {
+      throw new BadRequestException(allListsError.message);
+    }
+    const result = allLists.map((list) => {
+      if (list.id === data[0].id) {
+        list.cards = [];
+      }
+      return list;
+    });
+    return allLists;
   }
 
   async updateLists(lists: UpdateListDto[], boardId: string) {
@@ -193,12 +216,15 @@ export class ListService {
         .select();
     });
 
-    const [{ data, error }] = await Promise.all(updateLists);
-
-    if (error) {
-      throw new BadRequestException(error.message);
+    const results = await Promise.all(updateLists);
+    const dataArray = results.flatMap((result) => result.data);
+    console.log(dataArray);
+    if (
+      results.map((result) => result.error).filter((error) => error).length > 0
+    ) {
+      throw new BadRequestException('Error updating lists');
     }
-    return data;
+    return dataArray;
   }
 
   async remove(id: string) {
@@ -211,10 +237,14 @@ export class ListService {
       throw new BadRequestException(error.message);
     }
 
-    return data;
+    return data[0];
   }
 
-  async updateListCard(previousList: UpdateListDto, list: UpdateListDto, boardId: string) {
+  async updateListCard(
+    previousList: UpdateListDto,
+    list: UpdateListDto,
+    boardId: string,
+  ) {
     if (!previousList || !list) {
       throw new BadRequestException('No lists provided');
     }
@@ -263,18 +293,22 @@ export class ListService {
     console.log(list.cards);
 
     for (let i = 0; i < previousList.cards.length; i++) {
-        promises.push(this.supbaseService.supabase
-            .from('card')
-            .update({ listId: previousList.id , position: i })
-            .eq('id', previousList.cards[i].id)
-            .select());
+      promises.push(
+        this.supbaseService.supabase
+          .from('card')
+          .update({ listId: previousList.id, position: i })
+          .eq('id', previousList.cards[i].id)
+          .select(),
+      );
     }
     for (let i = 0; i < list.cards.length; i++) {
-      promises.push(this.supbaseService.supabase
+      promises.push(
+        this.supbaseService.supabase
           .from('card')
           .update({ listId: list.id, position: i })
           .eq('id', list.cards[i].id)
-          .select());
+          .select(),
+      );
     }
     let result = await Promise.all(promises);
     console.log(result);
