@@ -73,6 +73,47 @@ export class BoardService {
   }
 
   async remove(id: string) {
+    //get BackgroundId from Board
+    const { data: board, error: boardError } = await this.supabase.supabase
+      .from('board')
+      .select('backgroundId')
+      .eq('id', id)
+      .single();
+
+    const { data: background, error: backgroundError } =
+      await this.supabase.supabase
+        .from('background')
+        .select('isPredefined, fileName, createdAt')
+        .eq('id', board.backgroundId)
+        .single();
+
+    if (backgroundError) {
+      throw new BadRequestException(backgroundError.message);
+    }
+
+    if (!background.isPredefined) {
+      //delete from storage
+      const { data: deleteStorage, error: deleteStorageError } =
+        await this.supabase.supabase.storage
+          .from('background')
+          .remove([
+            `background/${background.fileName}-${background.createdAt.getTime()}`,
+          ]);
+
+      if (deleteStorageError) {
+        throw new BadRequestException(deleteStorageError.message);
+      }
+
+      const { data: deleteBackground, error: deleteBackgroundError } =
+        await this.supabase.supabase
+          .from('background')
+          .delete()
+          .eq('id', board.backgroundId);
+      if (deleteBackgroundError) {
+        throw new BadRequestException(deleteBackgroundError.message);
+      }
+    }
+
     return this.supabase.supabase.from('board').delete().eq('id', id);
   }
 
@@ -91,13 +132,74 @@ export class BoardService {
     return data;
   }
 
-  createPredefined(createBoardDto: CreateBoardDto, uid: string) {
-    return this.supabase.supabase.from('board').insert({
-      name: createBoardDto.name,
-      createdAt: new Date(),
-      ownerId: uid,
-      backgroundId: createBoardDto.backgroundId,
-    });
+  async create(
+    createBoardDto: CreateBoardDto,
+    uid: string,
+    file: Express.Multer.File,
+  ) {
+    if (!createBoardDto.backgroundId) {
+      const date = new Date();
+      //upload file
+      const { data: background, error: backgroundError } =
+        await this.supabase.supabase.storage
+          .from('background')
+          .upload(
+            `background/${file.originalname}-${date.getTime()}`,
+            file.buffer,
+            {
+              upsert: true,
+              contentType: file.mimetype,
+            },
+          );
+      if (backgroundError) {
+        throw new BadRequestException(backgroundError.message);
+      }
+      //get public url
+      const { data: publicURL } = await this.supabase.supabase.storage
+        .from('background')
+        .getPublicUrl(`background/${file.originalname}-${date.getTime()}`);
+
+      //create a row in the background table
+      const { data: backgroundData, error: backgroundDataError } =
+        await this.supabase.supabase
+          .from('background')
+          .insert({
+            fileLocation: publicURL.publicUrl,
+            fileName: file.originalname,
+            isPredefined: false,
+            createdAt: date,
+          })
+          .select()
+          .single();
+
+      if (backgroundDataError) {
+        throw new BadRequestException(backgroundDataError.message);
+      }
+
+      //create a row in the board table
+      const { data: board, error: boardError } = await this.supabase.supabase
+        .from('board')
+        .insert({
+          name: createBoardDto.name,
+          createdAt: date,
+          ownerId: uid,
+          backgroundId: backgroundData.id,
+        })
+        .select();
+
+      return board;
+    } else {
+      const { data: board, error: boardError } = await this.supabase.supabase
+        .from('board')
+        .insert({
+          name: createBoardDto.name,
+          createdAt: new Date(),
+          ownerId: uid,
+          backgroundId: createBoardDto.backgroundId,
+        })
+        .select();
+      return board;
+    }
   }
 
   async findInvitedBoards(uid: string) {

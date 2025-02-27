@@ -45,4 +45,6 @@ export class BackgroundService {
   findOne(id: string) {
     return this.supabase.supabase.from('background').select().eq('id', id);
   }
+
+  async changBackground(file: Express.Multer.File, backgroundId) {}
 }

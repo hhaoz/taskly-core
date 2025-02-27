@@ -6,15 +6,18 @@ export class Background {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column('text')
-  color?: string;
+  @Column('text', { nullable: true })
+  color: string;
 
-  @Column('text')
+  @Column('text', { nullable: true })
   fileName?: string;
 
-  @Column('text')
-  fileLocation?: string;
+  @Column('text', { nullable: true })
+  fileLocation: string;
 
-  // @Column('boolean')
-  // isPredefined: boolean;
+  @Column('timestamptz', { default: () => 'CURRENT_TIMESTAMP' })
+  createdAt: Date;
+
+  @Column('boolean', { default: true })
+  isPredefined: boolean;
 }

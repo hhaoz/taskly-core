@@ -16,7 +16,8 @@ export class CreateBoardDto {
   name: string;
 
   @IsUUID()
-  backgroundId: string;
+  @IsOptional()
+  backgroundId?: string;
 
   // @IsOptional()
   // @IsUUID()

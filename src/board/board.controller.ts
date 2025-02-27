@@ -30,8 +30,16 @@ export class BoardController {
   // }
 
   @Post()
-  createPredefined(@Body() createBoardDto: CreateBoardDto, @Req() req: any) {
-    return this.boardService.createPredefined(createBoardDto, req.user.uid);
+  createPredefined(
+    @Body() createBoardDto: CreateBoardDto,
+    @Req() req: any,
+    @UploadedFile() background?: Express.Multer.File,
+  ) {
+    console.log(req.user.uid);
+    console.log(background);
+    console.log(createBoardDto);
+
+    return this.boardService.create(createBoardDto, req.user.uid, background);
   }
 
   @Put('background/:id')

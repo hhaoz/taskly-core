@@ -41,7 +41,7 @@ export class AuthService {
         .single();
 
     if (!existingUser) {
-      const { error: insertError } = await this.supabase.supabase
+      const { data, error: insertError } = await this.supabase.supabase
         .from('user')
         .insert([
           {
@@ -56,6 +56,6 @@ export class AuthService {
         throw new BadRequestException(insertError.message);
       }
     }
-    return HttpStatus.OK;
+    return existingUser;
   }
 }

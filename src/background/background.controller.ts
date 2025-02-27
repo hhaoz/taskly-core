@@ -22,6 +22,17 @@ export class BackgroundController {
     return this.backgroundService.findAllPredefined();
   }
 
+  @Put('upload')
+  changeBackground(
+    @Body() backgroundId: { backgroundId: string },
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return this.backgroundService.changBackground(
+      file,
+      backgroundId.backgroundId,
+    );
+  }
+
   // @Get(':id')
   // findOne(@Param('id') id: string) {
   //   return this.backgroundService.findOne(id);
